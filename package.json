@@ -1,0 +1,40 @@
+{
+  "name": "portfolio-backend",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/distant-skylines-xtal-portfolio/portfolio-backend.git"
+  },
+  "keywords": [],
+  "author": "Evan McLay",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/distant-skylines-xtal-portfolio/portfolio-backend/issues"
+  },
+  "homepage": "https://github.com/distant-skylines-xtal-portfolio/portfolio-backend#readme",
+  "description": "",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
