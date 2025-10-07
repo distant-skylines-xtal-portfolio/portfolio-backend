@@ -23,7 +23,7 @@ app.use(helmet({
 //CORS
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
-    ? 'https://yourdomain.com'
+    ? 'https://portfolio-backend-production-5eaa.up.railway.app'
     : 'http://localhost:3000', //Dev server
     credentials: true,
 }))
