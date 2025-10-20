@@ -7,6 +7,8 @@ import path from 'path';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import apiRoutes from './routes';
+import gamesRoutes from './routes/games.routes';
+
 
 //Load Environment variables
 dotenv.config();
@@ -59,6 +61,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.use('/api', apiRoutes);
+
+app.use(gamesRoutes);
 
 /* 
     Static File Serving
