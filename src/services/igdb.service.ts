@@ -50,10 +50,10 @@ export class IGDBService {
     }
 
     private buildQuery(filters: any): string {
-        let query = 'fields name,cover.*,genres.*,platforms.*,summary,rating';
+        let query = 'fields name,cover.*,genres.*,platforms.*,summary,rating;';
 
         if (filters.platforms) {
-            query += `where platforms = (${filters.platforms.join('.')});`;
+            query += ` where platforms = (${filters.platforms.join(',')});`;
         }
 
         query += 'limit 50';
