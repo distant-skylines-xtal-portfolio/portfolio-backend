@@ -8,4 +8,5 @@ router.post('/api/games/recommend', gamesController.getRecommendations);
 router.get('/api/games/genres', gamesController.getGenres);
 router.get('/api/games/platforms', gamesController.getPlatforms);
 
+router.get('/api/games/search', gamesController.searchByName);
 export default router;

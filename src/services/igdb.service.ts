@@ -1,7 +1,10 @@
 import axios from 'axios';
 import NodeCache from 'node-cache';
 
-const gameCache = new NodeCache({stdTTL: 866400 });
+const gameCache = new NodeCache({
+    stdTTL: 604800,
+    checkperiod: 86400
+});
 
 export class IGDBService {
     private accessToken: string = '';
@@ -49,6 +52,36 @@ export class IGDBService {
 
     }
 
+    async searchGameByName(search:string): Promise<any> {
+        const cacheKey = search;
+        const cachedData = gameCache.get(cacheKey);
+
+        if (cachedData) {
+            return cachedData;
+        }
+
+        const token = await this.getAccessToken();
+
+        let query = ` search ${search}`;
+        query += ` fields name,cover,genres,summary,rating,first_release_date,platforms,language_support;`;
+        query += ` limit 50;`
+        const response = await fetch('https://api.igdb.com/v4/games', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Client-ID': process.env.IGDB_CLIENT_ID,
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: query
+                
+            })
+
+        const searchResults = await response.json();
+        
+        gameCache.set(cacheKey, searchResults);
+        return searchResults;
+    }
+
     private buildQuery(filters: any): string {
         let query = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
 
@@ -67,7 +100,7 @@ export class IGDBService {
                 query += ` & rating > ${filters.rating + 1};`;
             }
         }
-        
+
 
         query += 'limit 50';
         console.log(`built query: ${query}`);

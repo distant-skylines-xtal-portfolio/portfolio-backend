@@ -93,4 +93,17 @@ export class GamesController {
             })
         }
     }
+
+    searchByName = async(req: Request, res: Response) => {
+        try {
+            await this.igdbService.searchGameByName(req.body);
+            
+
+        } catch (error) {
+            console.error(`Error searching game by name:`, error);
+            return res.status(500).json({
+                error: 'Failed to search game by name',
+            })
+        }
+    }
 }
