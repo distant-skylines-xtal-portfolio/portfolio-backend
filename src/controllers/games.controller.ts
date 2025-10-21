@@ -67,17 +67,18 @@ export class GamesController {
             const response = await fetch('https://api.igdb.com/v4/platforms', {
                 method: 'POST',
                 headers: {
+                    'Accept': 'application/json',
                     'Client-ID': process.env.IGDB_CLIENT_ID,
                     'Authorization': `Bearer ${token}`,
                 },
-                body: `fields id,name,abbreviation,category;
-                        where category = (1,6);
-                        limit 50;
+                body: `fields alternative_name,name,abbreviation,platform_type;
+                        where platform_typed = (1,6) & generation > 2;
+                        limit 75;
                         sort name asc;`
             })
 
             const platforms = await response.json();
-
+            console.log(platforms)
 
             return res.json({
                 success: true,

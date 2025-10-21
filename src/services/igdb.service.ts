@@ -50,14 +50,27 @@ export class IGDBService {
     }
 
     private buildQuery(filters: any): string {
-        let query = 'fields name,cover.*,genres.*,platforms.*,summary,rating;';
+        let query = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
+
+        query +=  ' where ';
 
         if (filters.platforms) {
-            query += ` where platforms = (${filters.platforms.join(',')});`;
+            query += `platforms = (${filters.platforms.join(',')})`;
         }
 
-        query += 'limit 50';
+        if (filters.genres) {
+            query += ` & genres = (${filters.genres.join(',')})`
+        }
 
+        if (filters.rating) {
+            if (filters.rating > 0 && filters.rating < 100) {
+                query += ` & rating > ${filters.rating + 1};`;
+            }
+        }
+        
+
+        query += 'limit 50';
+        console.log(`built query: ${query}`);
         return query;
     }
 }
