@@ -17,10 +17,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-//Security headers
-app.use(helmet({
-    contentSecurityPolicy: false,
-}))
 
 //CORS
 app.use(cors({
@@ -28,8 +24,14 @@ app.use(cors({
     ? 'https://portfolio-backend-production-5eaa.up.railway.app'
     : 'http://localhost:3000', //Dev server
     credentials: true,
-}))
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
+//Security headers
+app.use(helmet({
+    contentSecurityPolicy: false,
+}))
 //Request logging
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 

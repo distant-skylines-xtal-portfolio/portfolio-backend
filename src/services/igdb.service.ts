@@ -59,11 +59,10 @@ export class IGDBService {
         if (cachedData) {
             return cachedData;
         }
-
+        
         const token = await this.getAccessToken();
-
-        let query = ` search ${search}`;
-        query += ` fields name,cover,genres,summary,rating,first_release_date,platforms,language_support;`;
+        let query = ` search "${search}";`;
+        query += ` fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;`;
         query += ` limit 50;`
         const response = await fetch('https://api.igdb.com/v4/games', {
                 method: 'POST',
@@ -75,9 +74,8 @@ export class IGDBService {
                 body: query
                 
             })
-
         const searchResults = await response.json();
-        
+
         gameCache.set(cacheKey, searchResults);
         return searchResults;
     }

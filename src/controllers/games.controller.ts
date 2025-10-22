@@ -72,7 +72,7 @@ export class GamesController {
                     'Authorization': `Bearer ${token}`,
                 },
                 body: `fields alternative_name,name,abbreviation,platform_type;
-                        where platform_typed = (1,6) & generation > 2;
+                        where platform_type = (1,6) & generation > 2;
                         limit 75;
                         sort name asc;`
             })
@@ -96,8 +96,13 @@ export class GamesController {
 
     searchByName = async(req: Request, res: Response) => {
         try {
-            await this.igdbService.searchGameByName(req.body);
-            
+            const searchBody = req.body;
+            const searchResult = await this.igdbService.searchGameByName(searchBody.search);
+
+            return res.json({
+                success: true,
+                result: searchResult,
+            });
 
         } catch (error) {
             console.error(`Error searching game by name:`, error);
