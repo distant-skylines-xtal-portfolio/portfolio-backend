@@ -18,6 +18,8 @@ export class GamesController {
                 });
             }
 
+            console.log(filters);
+
             const games = await this.igdbService.searchGames(filters);
 
             return res.json({
@@ -78,7 +80,6 @@ export class GamesController {
             })
 
             const platforms = await response.json();
-            console.log(platforms)
 
             return res.json({
                 success: true,

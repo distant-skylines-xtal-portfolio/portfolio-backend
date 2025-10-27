@@ -86,21 +86,42 @@ export class IGDBService {
         query +=  ' where ';
 
         if (filters.platforms) {
-            query += `platforms = (${filters.platforms.join(',')})`;
+            let platformsString = ''
+            for (let platform of filters.platforms) {
+                platformsString += platform.id + ',';
+            }
+
+            if (platformsString.endsWith(',')) {
+                platformsString = platformsString.slice(0, -1);
+            }
+            query += `platforms = (${platformsString})`;
         }
 
+        
+
         if (filters.genres) {
-            query += ` & genres = (${filters.genres.join(',')})`
+            let genresString = ''
+            for (let genre of filters.genres) {
+                genresString += genre.id + ',';
+            }
+
+            if (genresString.endsWith(',')) {
+                genresString = genresString.slice(0, -1);
+            }
+            query += ` & genres = (${genresString})`
         }
 
         if (filters.rating) {
             if (filters.rating > 0 && filters.rating < 100) {
-                query += ` & rating > ${filters.rating + 1};`;
+                query += ` & rating > ${filters.rating + 1}`;
             }
         }
 
+        if (!query.endsWith(";")) {
+            query += ';'
+        }
 
-        query += 'limit 50';
+        query += 'limit 50;';
         console.log(`built query: ${query}`);
         return query;
     }
