@@ -83,6 +83,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
             path: req.path,
         });
     }
+
+    if (req.path.startsWith('/apps/gamerecommender')) {
+        return res.sendFile(path.join(__dirname, '../public/apps/game-recommender/index.html'));
+    }
+
+    //Default to portfolio front-end
     res.sendFile(path.join(__dirname, '../public/index.html'));
 })
 
