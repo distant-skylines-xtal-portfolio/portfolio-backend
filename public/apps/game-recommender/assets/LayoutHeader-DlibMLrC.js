@@ -1,0 +1,1 @@
+import{q as a,p as e,O as s}from"./chunk-OIYGIGL5-BonJDuKv.js";function n(){return e.jsxs("div",{className:"app-container",children:[e.jsx("header",{children:e.jsx("h1",{children:"Game recommendations!"})}),e.jsx("main",{children:e.jsx(s,{})})]})}const t=a(n);export{t as default};
