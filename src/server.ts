@@ -84,7 +84,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
         });
     }
 
-    if (req.path.startsWith('/apps/gamerecommender')) {
+    if (req.path.startsWith('/apps/game-recommender')) {
         return res.sendFile(path.join(__dirname, '../public/apps/game-recommender/index.html'));
     }
 
