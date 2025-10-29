@@ -22,7 +22,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
     ? 'https://portfolio-backend-production-5eaa.up.railway.app'
-    : 'http://localhost:3000', //Dev server
+    : ['http://localhost:3000',
+        'http://localhost:5173'
+    ], //Dev server
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

@@ -6,6 +6,11 @@ const gameCache = new NodeCache({
     checkperiod: 86400
 });
 
+const imageCache = new NodeCache({
+    stdTTL: 604800,
+    checkperiod: 86400
+})
+
 export class IGDBService {
     private accessToken: string = '';
     private tokenExpiry: number = 0;
@@ -84,7 +89,7 @@ export class IGDBService {
         let query = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
 
         query +=  ' where ';
-
+        
         if (filters.platforms) {
             let platformsString = ''
             for (let platform of filters.platforms) {

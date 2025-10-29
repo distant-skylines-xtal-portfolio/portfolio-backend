@@ -112,4 +112,69 @@ export class GamesController {
             })
         }
     }
+
+
+    getCover = async(req: Request, res: Response) => {
+        try {
+            const token = await this.igdbService.getAccessToken();
+
+            if (!req.body || !req.body.gameId) {
+                return res.status(400).json({
+                    error: 'Please provide game Id in request body'
+                });
+            }
+            console.log(`cover request with game id: ${req.body.gameId}`);
+            const coverInfoResponse = await fetch('https://api.igdb.com/v4/covers', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Client-ID': process.env.IGDB_CLIENT_ID!,
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: 
+                    `fields alpha_channel,animated,checksum,game,game_localization,height,image_id,url,width;
+                    where game=${req.body.gameId};`
+            });
+            
+            const coverInfoJson: coverInfoType[] = await coverInfoResponse.json() as coverInfoType[];
+
+            if (!coverInfoJson || coverInfoJson.length === 0) {
+                return res.status(404).json({
+                    error: `Could not get cover associated with game ID ${req.body.gameId}`,
+                });
+            }
+            
+            // Construct and return the image URL to the frontend
+            const imageUrl = `https://images.igdb.com/igdb/image/upload/t_cover_big/${coverInfoJson[0].image_id}.jpg`;
+            
+            return res.json({
+                success: true,
+                imageUrl: imageUrl,
+                coverInfo: {
+                    width: coverInfoJson[0].width,
+                    height: coverInfoJson[0].height,
+                    animated: coverInfoJson[0].animated
+                }
+            });
+            
+        } catch(error) {
+            console.error(`Error getting game cover:`, error);
+            return res.status(500).json({
+                error: 'Failed to get game cover',
+            });
+        }
+    
+    }
+}
+
+interface coverInfoType {
+        id: number,
+        alpha_channel: boolean,
+        animated: boolean,
+        game: number,
+        height: number,
+        image_id: string,
+        url: string,
+        width: number,
+        checksum: string,
 }
