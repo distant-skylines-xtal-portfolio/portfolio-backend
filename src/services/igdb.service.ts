@@ -11,6 +11,13 @@ const imageCache = new NodeCache({
     checkperiod: 86400
 })
 
+interface IGDBKeyword {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+
 export class IGDBService {
     private accessToken: string = '';
     private tokenExpiry: number = 0;
@@ -85,6 +92,24 @@ export class IGDBService {
         return searchResults;
     }
 
+    async fetchKeywords(offset: number, requestLimit: number):Promise<IGDBKeyword[]> {
+        const token = await this.getAccessToken();
+
+        const response = await axios.post(
+            `https://api.igdb.com/v4/keywords`,
+            `fields id, name, slug; limit ${requestLimit}; offset ${offset};`,
+            {
+                headers: {
+                    'Client-ID': process.env.IGDB_CLIENT_ID,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'text/plain' 
+                }
+                
+            }
+        );
+        return response.data;
+    }
+
     private buildQuery(filters: any): string {
         let query = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
 
@@ -131,3 +156,5 @@ export class IGDBService {
         return query;
     }
 }
+
+export const igdbService = new IGDBService(); 

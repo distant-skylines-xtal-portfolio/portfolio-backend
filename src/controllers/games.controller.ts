@@ -1,11 +1,13 @@
 import {Request, Response} from 'express';
-import { IGDBService } from '../services/igdb.service';
+import { igdbService } from '../services/igdb.service';
+import type { IGDBService } from '../services/igdb.service';
+import { keywordService } from '../services/keywords.service';
 
 export class GamesController {
     private igdbService: IGDBService;
 
     constructor() {
-        this.igdbService = new IGDBService();
+        this.igdbService = igdbService;
     }
 
     getRecommendations = async (req: Request, res: Response) => {
@@ -164,6 +166,19 @@ export class GamesController {
             });
         }
     
+    }
+
+    getKeywords = async(req: Request, res: Response) => {
+        try {
+            const keywords = await keywordService.getAllKeywords();
+            res.json({
+                keywords,
+                count: keywords.length
+            });
+        } catch(error) {
+            console.error('Error fetching keywords:', error);
+            res.status(500).json({error: 'Failed to fetch keywords'});
+        }
     }
 }
 
