@@ -17,6 +17,36 @@ interface IGDBKeyword {
     slug: string;
 }
 
+interface genreFilter {
+    type: 'genreTag';
+    formattedType: 'Genre';
+    id: number;
+    name: string;
+}
+
+interface platformFilter {
+    type: 'platformTag';
+    formattedType: 'Platform';
+    abbreviation: string;
+    alternative_name: string;
+    id: number;
+    name: string;
+    platform_type: number;    
+}
+
+interface keywordFilter {
+    type: 'keywordTag';
+    formattedType: 'Keyword';
+    id: number;
+    name: string;
+}
+
+interface recFilters {
+    genres: genreFilter[];
+    platforms: platformFilter[];
+    keywords: keywordFilter[]; 
+}
+
 
 export class IGDBService {
     private accessToken: string = '';
@@ -39,7 +69,7 @@ export class IGDBService {
         return this.accessToken;
     }
 
-    async searchGames(filters: any): Promise<any> {
+    async searchGames(filters: recFilters): Promise<any> {
         const cachekey = JSON.stringify(filters);
         const cachedData = gameCache.get(cachekey);
 
@@ -110,12 +140,12 @@ export class IGDBService {
         return response.data;
     }
 
-    private buildQuery(filters: any): string {
-        let query = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
-
-        query +=  ' where ';
+    private buildQuery(filters: recFilters): string {
+        let finalQuery = 'fields name,cover,genres,summary,rating,first_release_date,platforms,language_supports;';
         
-        if (filters.platforms) {
+        let queryParams: string[] = [];
+
+        if (filters.platforms?.length > 0) {
             let platformsString = ''
             for (let platform of filters.platforms) {
                 platformsString += platform.id + ',';
@@ -124,12 +154,12 @@ export class IGDBService {
             if (platformsString.endsWith(',')) {
                 platformsString = platformsString.slice(0, -1);
             }
-            query += `platforms = (${platformsString})`;
+            queryParams.push(`platforms = [${platformsString}]`);
         }
 
         
 
-        if (filters.genres) {
+        if (filters.genres?.length > 0) {
             let genresString = ''
             for (let genre of filters.genres) {
                 genresString += genre.id + ',';
@@ -138,22 +168,49 @@ export class IGDBService {
             if (genresString.endsWith(',')) {
                 genresString = genresString.slice(0, -1);
             }
-            query += ` & genres = (${genresString})`
+
+            
+            queryParams.push(`genres = [${genresString}]`);
         }
 
-        if (filters.rating) {
-            if (filters.rating > 0 && filters.rating < 100) {
-                query += ` & rating > ${filters.rating + 1}`;
+        if (filters.keywords?.length > 0) {
+            let keywordsString = '';
+            for (let keyword of filters.keywords) {
+                keywordsString += keyword.id + ',';
             }
+
+            if (keywordsString.endsWith(',')) {
+                keywordsString = keywordsString.slice(0, -1);
+            }
+            console.log(keywordsString);
+            queryParams.push(`keywords = [${keywordsString}]`);
         }
 
-        if (!query.endsWith(";")) {
-            query += ';'
+        // if (filters.rating) {
+        //     if (filters.rating > 0 && filters.rating < 100) {
+        //         query += ` & rating > ${filters.rating + 1}`;
+        //     }
+        // }
+
+        for (let i = 0; i < queryParams.length; i++) {
+            if (i === 0) {
+                finalQuery += ' where ';
+                finalQuery += queryParams[i];
+                continue;
+            }
+
+            finalQuery += ' & ' + queryParams[i];
+
+            
         }
 
-        query += 'limit 50;';
-        console.log(`built query: ${query}`);
-        return query;
+        if (!finalQuery.endsWith(";")) {
+            finalQuery += ';'
+        }
+
+        finalQuery += ' limit 50;';
+        console.log(`built query: ${finalQuery}`);
+        return finalQuery;
     }
 }
 
