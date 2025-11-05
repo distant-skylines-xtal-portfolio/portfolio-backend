@@ -45,6 +45,7 @@ interface recFilters {
     genres: genreFilter[];
     platforms: platformFilter[];
     keywords: keywordFilter[]; 
+    offset: number;
 }
 
 
@@ -82,6 +83,15 @@ export class IGDBService {
         //Create Query for IGDB
         const query = this.buildQuery(filters);
 
+        const countResponse = await axios.post('https://api.igdb.com/v4/games/count', query, {
+            headers: {
+                'Client-ID': process.env.IGDB_CLIENT_ID,
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        
+
         const response = await axios.post('https://api.igdb.com/v4/games', query, {
             headers: {
                 'Client-ID': process.env.IGDB_CLIENT_ID,
@@ -89,8 +99,12 @@ export class IGDBService {
             }
         });
 
-        gameCache.set(cachekey, response.data);
-        return response.data;
+        const combinedResponse = {
+            count: countResponse.data.count,
+            games: response.data,
+        }
+        gameCache.set(cachekey, combinedResponse);
+        return combinedResponse;
 
     }
 
@@ -154,7 +168,12 @@ export class IGDBService {
             if (platformsString.endsWith(',')) {
                 platformsString = platformsString.slice(0, -1);
             }
-            queryParams.push(`platforms = [${platformsString}]`);
+
+            if (filters.platforms.length === 1) {
+                queryParams.push(`platforms = ${platformsString}`);
+            } else {
+                queryParams.push(`platforms = [${platformsString}]`);
+            }
         }
 
         
@@ -169,8 +188,12 @@ export class IGDBService {
                 genresString = genresString.slice(0, -1);
             }
 
+            if (filters.genres.length === 1) {
+                queryParams.push(`genres = ${genresString}`);
+            } else {
+                queryParams.push(`genres = [${genresString}]`);
+            }
             
-            queryParams.push(`genres = [${genresString}]`);
         }
 
         if (filters.keywords?.length > 0) {
@@ -183,7 +206,12 @@ export class IGDBService {
                 keywordsString = keywordsString.slice(0, -1);
             }
             console.log(keywordsString);
-            queryParams.push(`keywords = [${keywordsString}]`);
+
+            if (filters.keywords.length === 1) {
+                queryParams.push(`keywords = ${keywordsString}`);
+            } else {
+                queryParams.push(`keywords = [${keywordsString}]`);
+            }
         }
 
         // if (filters.rating) {
@@ -200,15 +228,15 @@ export class IGDBService {
             }
 
             finalQuery += ' & ' + queryParams[i];
-
-            
         }
+
 
         if (!finalQuery.endsWith(";")) {
             finalQuery += ';'
         }
 
         finalQuery += ' limit 50;';
+        finalQuery += ` offset ${filters.offset};`;
         console.log(`built query: ${finalQuery}`);
         return finalQuery;
     }

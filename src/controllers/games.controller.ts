@@ -13,7 +13,7 @@ export class GamesController {
     getRecommendations = async (req: Request, res: Response) => {
         try {
             const filters = req.body;
-
+            console.log('getting recommendations')
             if (!filters || Object.keys(filters).length === 0) {
                 return res.status(400).json({
                     error: 'Please provide at least one filter'
@@ -26,8 +26,8 @@ export class GamesController {
 
             return res.json({
                 success: true,
-                count: games.length,
-                games: games,
+                count: games.count,
+                games: games.games,
             });
         } catch (error) {
             console.error('Error getting recommendations:', error);
