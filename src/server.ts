@@ -65,41 +65,54 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.use('/api', apiRoutes);
-
 app.use(gamesRoutes);
+
+//404 handler for API routes
+app.use('/api/*splat', (req: Request, res: Response) => {
+    res.status(404).json({
+        error: 'API endpoint not found',
+        path: req.path,
+    });
+});
 
 /* 
     Static File Serving
 */
 
 //Portfolio Frontend
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        } else if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+    }
+}));
 
 //Webapps
-app.use('/apps', express.static(path.join(__dirname, '../public/apps')));
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith('/api')) {
-        return res.status(404).json({ 
-            error: 'API endpoint not found',
-            path: req.path,
-        });
+app.use('/apps/game-recommender', express.static(
+    path.join(__dirname, '../public/apps/game-recommender'),
+    {
+        index: false, // Don't auto-serve index.html for asset requests
+        setHeaders: (res, filePath) => {
+            if (filePath.endsWith('.js')) {
+                res.setHeader('Content-Type', 'application/javascript');
+            } else if (filePath.endsWith('.css')) {
+                res.setHeader('Content-Type', 'text/css');
+            }
+        }
     }
+));
 
-    if (req.path.startsWith('/apps/game-recommender')) {
-        return res.sendFile(path.join(__dirname, '../public/apps/game-recommender/index.html'));
-    }
+//Fallback for game recommedender
+app.get('/apps/game-recommender/*splat', (req: Request, res: Response) => {
+    res.sendFile(path.join(__dirname, '../public/apps/game-recommender/index.html'));
+});
 
-    //Default to portfolio front-end
+//Fallback for main portfolio site
+app.get('*splat', (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
-})
-
-// 404 handler for API routes
-app.use((req: Request, res: Response) => {
-  res.status(404).json({ 
-    error: 'API endpoint not found',
-    path: req.path,
-  });
 });
 
 // Global error handler
