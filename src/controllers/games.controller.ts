@@ -13,7 +13,6 @@ export class GamesController {
     getRecommendations = async (req: Request, res: Response) => {
         try {
             const filters = req.body;
-            console.log('getting recommendations')
             if (!filters || Object.keys(filters).length === 0) {
                 return res.status(400).json({
                     error: 'Please provide at least one filter'
@@ -178,6 +177,103 @@ export class GamesController {
         } catch(error) {
             console.error('Error fetching keywords:', error);
             res.status(500).json({error: 'Failed to fetch keywords'});
+        }
+    }
+
+    getFullGameInfo = async(req: Request, res: Response) => {
+        try {
+            if (!req.params.gameid) {
+                return res.status(400).json({
+                    error: 'Please provide a gameid in the request params'
+                });
+            }
+            const token = await this.igdbService.getAccessToken();
+
+            const response = await fetch('https://api.igdb.com/v4/games', {
+                method: 'POST',
+                headers: {
+                    'Client-ID': process.env.IGDB_CLIENT_ID!,
+                    'Authorization': `Bearer ${token}`
+                },
+                body: `fields age_ratings,aggregated_rating,aggregated_rating_count,alternative_names,artworks,bundles,category,checksum,collection,collections,cover,created_at,dlcs,expanded_games,expansions,external_games,first_release_date,follows,forks,franchise,franchises,game_engines,game_localizations,game_modes,game_status,game_type,genres,hypes,involved_companies,keywords,language_supports,multiplayer_modes,name,parent_game,platforms,player_perspectives,ports,rating,rating_count,release_dates,remakes,remasters,screenshots,similar_games,slug,standalone_expansions,status,storyline,summary,tags,themes,total_rating,total_rating_count,updated_at,url,version_parent,version_title,websites;` + 
+                    `where id = ${req.params.gameid};`
+            });
+
+            const responseJson = await response.json();
+
+            res.json({
+                success: true,
+                game: responseJson
+            })
+        } catch(error) {
+            console.error('Error getting full game info: ', error);
+            res.status(500).json({error: 'Failed to get full game info'});
+        }
+    }
+
+    getReleaseDates = async(req: Request, res: Response) => {
+        try {
+            if (!req.body.gameId) {
+                return res.status(400).json({
+                    error: 'Please provide a gameid in the request body'
+                });
+            }
+            const token = await this.igdbService.getAccessToken();
+
+            const response = await fetch('https://api.igdb.com/v4/release_dates', {
+                method: 'POST',
+                headers: {
+                    'Client-ID': process.env.IGDB_CLIENT_ID!,
+                    'Authorization': `Bearer ${token}`
+                },
+                body: `fields category,checksum,created_at,date,date_format,game,human,m,platform,region,release_region,status,updated_at,y;` + 
+                    `where game = ${req.body.gameId};`
+            });
+            
+            const responseJson = await response.json();
+            res.json({
+                success: true,
+                releaseDates: responseJson
+            })
+        } catch(error) {
+            console.error('Error getting release dates: ', error);
+            res.status(500).json({error: 'Failed to get release dates'});
+        }
+    }
+
+    getSimilarGames = async(req: Request, res: Response) => {
+        try {
+            if (!req.body || !req.body.gameIds || req.body.gameIds.length === 0) {
+                return res.status(400).json({
+                    error: 'Please provide a number array called gameIds in the request body!'
+                });
+            }
+
+            const token = await this.igdbService.getAccessToken();
+            let idFilter:string = req.body.gameIds.reduce((acc:string, current:number) => {
+                return acc += `${current}, `;
+            }, "");
+            idFilter = idFilter.slice(0, idFilter.length - 2);
+                    
+            const response = await fetch('https://api.igdb.com/v4/games', {
+                method: 'POST',
+                headers: {
+                    'Client-ID': process.env.IGDB_CLIENT_ID!,
+                    'Authorization': `Bearer ${token}`
+                },
+                body: `fields id,name,cover;` + 
+                    `where id = (${idFilter});`
+            });
+            
+            const responseJson = await response.json();
+            res.json({
+                success: true,
+                games: responseJson,
+            })
+
+        } catch(error) {
+            console.error('Error getting similar games: ', error);
+            res.status(500).json({error: 'Failed to get full game info'});
         }
     }
 }
