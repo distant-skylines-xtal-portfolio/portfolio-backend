@@ -75,16 +75,32 @@ export class GamesController {
                     'Authorization': `Bearer ${token}`,
                 },
                 body: `fields alternative_name,name,abbreviation,platform_type;
-                        where platform_type = (1,6) & generation > 2;
-                        limit 75;
+                        where platform_type = (1,3,5,6) & generation > 2;
+                        limit 200;
                         sort name asc;`
             })
 
             const platforms = await response.json();
 
+            const osResponse = await fetch('https://api.igdb.com/v4/platforms', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Client-ID': process.env.IGDB_CLIENT_ID,
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: `fields alternative_name,name,abbreviation,platform_type;
+                        where platform_type = (4);
+                        limit 200;
+                        sort name asc;`
+            })
+
+            const osPlatforms = await osResponse.json();
+
             return res.json({
                 success: true,
                 platforms: platforms,
+                operatingSystems: osPlatforms,
             });
 
 

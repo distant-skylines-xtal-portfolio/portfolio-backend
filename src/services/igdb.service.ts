@@ -170,7 +170,7 @@ export class IGDBService {
             }
 
             if (filters.platforms.length === 1) {
-                queryParams.push(`platforms = ${platformsString}`);
+                queryParams.push(`platforms = (${platformsString})`);
             } else {
                 queryParams.push(`platforms = [${platformsString}]`);
             }
@@ -189,7 +189,7 @@ export class IGDBService {
             }
 
             if (filters.genres.length === 1) {
-                queryParams.push(`genres = ${genresString}`);
+                queryParams.push(`genres = (${genresString})`);
             } else {
                 queryParams.push(`genres = [${genresString}]`);
             }
@@ -208,7 +208,7 @@ export class IGDBService {
             console.log(keywordsString);
 
             if (filters.keywords.length === 1) {
-                queryParams.push(`keywords = ${keywordsString}`);
+                queryParams.push(`keywords = (${keywordsString})`);
             } else {
                 queryParams.push(`keywords = [${keywordsString}]`);
             }
