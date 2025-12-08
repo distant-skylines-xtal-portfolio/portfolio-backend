@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/static/css/main.3d32130a.css",
-    "main.js": "/static/js/main.a6b0f1be.js",
+    "main.js": "/static/js/main.0ae8ef0a.js",
     "static/js/453.7f1595f6.chunk.js": "/static/js/453.7f1595f6.chunk.js",
     "static/media/Saira-VariableFont_wdth,wght.ttf": "/static/media/Saira-VariableFont_wdth,wght.f3b23fb5e7ee9909a63b.ttf",
     "index.html": "/index.html",
     "main.3d32130a.css.map": "/static/css/main.3d32130a.css.map",
-    "main.a6b0f1be.js.map": "/static/js/main.a6b0f1be.js.map",
+    "main.0ae8ef0a.js.map": "/static/js/main.0ae8ef0a.js.map",
     "453.7f1595f6.chunk.js.map": "/static/js/453.7f1595f6.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3d32130a.css",
-    "static/js/main.a6b0f1be.js"
+    "static/js/main.0ae8ef0a.js"
   ]
 }
